@@ -1,0 +1,95 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'scala'
+    id 'io.gatling.gradle' version "3.5.1"
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+ext {
+    scalaVersion = "2.13.6"
+    gatlingVersion = "3.5.1"
+}
+
+dependencies {
+    compile "org.scala-lang:scala-library:$scalaVersion"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation group: 'io.gatling', name: 'gatling-core', version: "$gatlingVersion"
+
+    // Gatling Dependencies
+    gatlingImplementation(
+            "io.gatling:gatling-core:${gatlingVersion}",
+            "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}",
+            "io.gatling:gatling-jdbc:${gatlingVersion}",
+            "io.gatling:gatling-graphite:${gatlingVersion}",
+    )
+    gatlingImplementation 'org.apache.commons:commons-lang3:3.4'
+    gatlingCompile(
+            'com.google.code.gson:gson:2.8.0',
+            'com.fasterxml.jackson.core:jackson-databind:2.10.3',
+            "ch.qos.logback:logback-classic:1.2.3",
+            "ch.qos.logback:logback-core:1.2.3",
+            'com.github.javafaker:javafaker:1.0.2',
+            "io.rest-assured:rest-assured:4.3.0",
+            'cglib:cglib-nodep:3.2.0'
+    )
+}
+
+
+gatling {
+    toolVersion = gatlingVersion
+    simulations = {
+        include "**/simulations/LoadTestSimulation.scala"
+        // More variants
+        // include "**/simulations/StressTestSimulation.scala"
+        // include "**/*Simulation*.scala"
+        // include "**/LoadTestSimulation.scala"
+        // include "**/package1/*Simulation.scala"
+    }
+    // include classes and resources from src/main
+    includeMainOutput = true
+    // include classes and resources from src/test
+    includeTestOutput = true
+    jvmArgs = ['-server', '-Xms3g', '-Xmx5g', '-XX:-UseGCOverheadLimit',
+               '-language:postfixOps',
+               '-Dgatling.useOldJenkinsJUnitSupport=true',
+               //'-Dgatling.conf.file=gatling_offline_writers.conf',
+               // --- Additional JVM args ---
+               // JVM args helper: https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html
+               '-XX:+HeapDumpOnOutOfMemoryError',
+               '-XX:+UseG1GC',
+               '-XX:+ParallelRefProcEnabled',
+               //'-XX:MaxInlineLevel=20',
+               //'-XX:MaxTrivialSize=12',
+               //'-XX:-UseBiasedLocking',
+               //'-XX:+AggressiveOpts',
+               //'-XX:+UseThreadPriorities',
+               //'-XX:ThreadPriorityPolicy=42',
+               //'-XX:+OptimizeStringConcat',
+               //'-XX:+UseFastAccessorMethods',
+               //'-XX:+UseParNewGC',
+               //'-XX:+UseConcMarkSweepGC',
+               //'-XX:+CMSParallelRemarkEnabled',
+               '-Djava.net.preferIPv4Stack=true',
+               '-Djava.net.preferIPv6Addresses=false'
+    ]
+    systemProperties = [
+            'file.encoding': 'UTF-8',
+            'gatling.useOldJenkinsJUnitSupport': true,
+            'gatling.conf.file': "gatling.conf",
+    ]
+    // WARNING: options below only work when logback config file isn't provided
+    logLevel = 'WARN' // logback root level
+    logHttp = 'ALL' // set to 'ALL' for all HTTP traffic in TRACE, 'FAILURES' for failed HTTP traffic in DEBUG
+}
+
+wrapper {
+    gradleVersion = "6.5"
+}
