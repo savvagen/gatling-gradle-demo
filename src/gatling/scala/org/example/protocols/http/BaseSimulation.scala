@@ -1,4 +1,4 @@
-package org.example
+package org.example.protocols.http
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._

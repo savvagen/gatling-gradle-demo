@@ -1,12 +1,14 @@
-package org.example
+package org.example.simulations
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ChainBuilder
+import io.gatling.core.structure.{ChainBuilder, ScenarioBuilder}
 import io.gatling.http.Predef._
+import org.example.protocols.http.BaseSimulation
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
-class MyFirstSimulation extends BaseSimulation {
+class FirstSimulation extends BaseSimulation {
 
 
   def myFirstScn: ChainBuilder =
@@ -17,7 +19,7 @@ class MyFirstSimulation extends BaseSimulation {
     ).pause(1.second)
 
 
-  val scn = scenario("Articles Scn").exec(myFirstScn)
+  val scn: ScenarioBuilder = scenario("Articles Scn").exec(myFirstScn)
 
   setUp(
     scn.inject(constantUsersPerSec(1).during(15 seconds)).protocols(httpConfig)
