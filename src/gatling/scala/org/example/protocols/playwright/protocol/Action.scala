@@ -12,6 +12,7 @@ import io.gatling.core.util.NameGen
 
 
 class PlaywrightNavigateActionBuilder(functionName: String, path: String) extends ActionBuilder {
+
   private def components(protocolComponentsRegistry: ProtocolComponentsRegistry) =
     protocolComponentsRegistry.components(PlaywrightProtocol.UpperProtocolKey)
 
@@ -23,7 +24,12 @@ class PlaywrightNavigateActionBuilder(functionName: String, path: String) extend
   }
 }
 
-class PlaywrightNavigateAction(functionName: String, path: String, protocol: PlaywrightProtocol, val statsEngine: StatsEngine, val clock: Clock, val next: Action) extends ExitableAction with NameGen {
+class PlaywrightNavigateAction(functionName: String,
+                               path: String,
+                               protocol: PlaywrightProtocol,
+                               val statsEngine: StatsEngine,
+                               val clock: Clock,
+                               val next: Action) extends ExitableAction with NameGen {
   override def name: String = functionName
 
   @inline
@@ -33,17 +39,16 @@ class PlaywrightNavigateAction(functionName: String, path: String, protocol: Pla
     //val now: Long = clock.nowMillis
     val startTime = now()
     try {
-
       val (playwright, context) = new PlaywrightClient(protocol.browser, protocol.launchOptions).runContext
       val page = context.newPage()
       page.navigate(protocol.baseUrl + path)
-//      page.click("*[title='NewArticle']")
-//      page.`type`("#id_subject", "Test")
-//      page.isVisible("text='Create Article'")
-//      page.selectOption("#id_author", "1")
-//      page.click("*[value='Save']")
-//      page.isVisible("text='Article Body'")
-      Thread.sleep(2000)
+      //page.click("*[title='NewArticle']")
+      //page.`type`("#id_subject", "Test")
+      //page.isVisible("text='Create Article'")
+      //page.selectOption("#id_author", "1")
+      //page.click("*[value='Save']")
+      //page.isVisible("text='Article Body'")
+      //Thread.sleep(2000)
       playwright.close()
 
       if (logger.underlying.isDebugEnabled) {

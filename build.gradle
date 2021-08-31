@@ -2,7 +2,7 @@ plugins {
     id 'idea'
     id 'java'
     id 'scala'
-    id 'io.gatling.gradle' version "3.5.1"
+    id 'io.gatling.gradle' version "3.6.1"
 }
 
 group 'org.example'
@@ -15,7 +15,7 @@ repositories {
 
 ext {
     scalaVersion = "2.13.6"
-    gatlingVersion = "3.5.1"
+    gatlingVersion = '3.6.1'
 }
 
 dependencies {
@@ -26,7 +26,7 @@ dependencies {
             "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}",
             "io.gatling:gatling-jdbc:${gatlingVersion}",
             "io.gatling:gatling-graphite:${gatlingVersion}",
-            "com.microsoft.playwright:playwright:1.12.1"
+            'com.microsoft.playwright:playwright:1.14.0'
     )
 
     // Gatling Dependencies
@@ -35,17 +35,17 @@ dependencies {
             "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}",
             "io.gatling:gatling-jdbc:${gatlingVersion}",
             "io.gatling:gatling-graphite:${gatlingVersion}",
-            "com.microsoft.playwright:playwright:1.12.1"
+            'com.microsoft.playwright:playwright:1.14.0'
     )
-    gatlingImplementation 'org.apache.commons:commons-lang3:3.4'
+    gatlingImplementation 'org.apache.commons:commons-lang3:3.12.0'
     gatlingCompile(
-            'com.google.code.gson:gson:2.8.0',
-            'com.fasterxml.jackson.core:jackson-databind:2.10.3',
-            "ch.qos.logback:logback-classic:1.2.3",
-            "ch.qos.logback:logback-core:1.2.3",
+            'com.google.code.gson:gson:2.8.8',
+            'com.fasterxml.jackson.core:jackson-databind:2.12.4',
+            'ch.qos.logback:logback-classic:1.2.5',
+            'ch.qos.logback:logback-core:1.2.5',
             'com.github.javafaker:javafaker:1.0.2',
-            "io.rest-assured:rest-assured:4.3.0",
-            'cglib:cglib-nodep:3.2.0'
+            'io.rest-assured:rest-assured:4.4.0',
+            'cglib:cglib-nodep:3.3.0'
     )
 }
 
