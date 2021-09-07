@@ -8,7 +8,7 @@ import org.example.protocols.playwright.protocol.PlaywrightProtocol
 
 import scala.language.postfixOps
 
-class PlaywrightPluginSimulation extends Simulation {
+class PlaywrightSimulation extends Simulation {
 
   val playwrightProtocol: PlaywrightProtocol = pl
     .baseUrl("http://127.0.0.1:8001")

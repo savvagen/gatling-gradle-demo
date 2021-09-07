@@ -3,30 +3,51 @@ plugins {
     id 'java'
     id 'scala'
     id 'io.gatling.gradle' version "3.6.1"
+    id "de.undercouch.download" version "1.2"
 }
 
 group 'org.example'
 version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-    jcenter()
-}
 
 ext {
     scalaVersion = "2.13.6"
     gatlingVersion = '3.6.1'
 }
 
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+sourceSets {
+    main {
+        scala {
+            srcDirs = ['src/main/scala']
+        }
+    }
+    test {
+        scala {
+            srcDirs = ['src/test/scala']
+        }
+    }
+    gatling {
+        scala.srcDirs = ["src/gatling/scala", "src/main/scala"]
+        resources.srcDir "src/gatling/resources"
+    }
+}
+
 dependencies {
     compile "org.scala-lang:scala-library:$scalaVersion"
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.2'
     implementation(
             "io.gatling:gatling-core:${gatlingVersion}",
             "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}",
             "io.gatling:gatling-jdbc:${gatlingVersion}",
             "io.gatling:gatling-graphite:${gatlingVersion}",
-            'com.microsoft.playwright:playwright:1.14.0'
+            'com.microsoft.playwright:playwright:1.14.1',
+            'io.rest-assured:rest-assured:4.4.0',
+            'com.google.code.gson:gson:2.8.8',
+            'com.github.javafaker:javafaker:1.0.2',
     )
 
     // Gatling Dependencies
@@ -35,18 +56,21 @@ dependencies {
             "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}",
             "io.gatling:gatling-jdbc:${gatlingVersion}",
             "io.gatling:gatling-graphite:${gatlingVersion}",
-            'com.microsoft.playwright:playwright:1.14.0'
+            'com.microsoft.playwright:playwright:1.14.1'
     )
     gatlingImplementation 'org.apache.commons:commons-lang3:3.12.0'
+    gatling 'com.github.javafaker:javafaker:1.0.2'
     gatlingCompile(
             'com.google.code.gson:gson:2.8.8',
-            'com.fasterxml.jackson.core:jackson-databind:2.12.4',
+            'com.fasterxml.jackson.core:jackson-databind:2.12.5',
             'ch.qos.logback:logback-classic:1.2.5',
             'ch.qos.logback:logback-core:1.2.5',
-            'com.github.javafaker:javafaker:1.0.2',
             'io.rest-assured:rest-assured:4.4.0',
             'cglib:cglib-nodep:3.3.0'
     )
+    // Gatling AMQP Plugin for RabbitMQ Testing
+    // + Gatling extension: https://github.com/TinkoffCreditSystems/gatling-picatinny
+    gatlingCompile group: 'ru.tinkoff', name: 'gatling-amqp-plugin_2.13', version: '0.5.1'
 }
 
 
@@ -95,6 +119,73 @@ gatling {
     // WARNING: options below only work when logback config file isn't provided
     logLevel = 'WARN' // logback root level
     logHttp = 'ALL' // set to 'ALL' for all HTTP traffic in TRACE, 'FAILURES' for failed HTTP traffic in DEBUG
+}
+
+
+import de.undercouch.gradle.tasks.download.Download
+task downloadGatling(type: Download){
+    src "https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/${gatlingVersion}/gatling-charts-highcharts-bundle-${gatlingVersion}-bundle.zip"
+    dest "gatling-${gatlingVersion}.zip"
+    doLast {
+        exec {
+            commandLine 'sh', '-c', "unzip gatling-${gatlingVersion}.zip -x &&" +
+                    "mv gatling-charts-highcharts-bundle-${gatlingVersion} gatling-$gatlingVersion"
+            //"rm -r gatling-${gatlingVersion}.zip"
+        }
+    }
+}
+//downloadGatling.finalizedBy(deleteGatlingArtifact)
+
+task gatlingReport(type: Exec){
+    environment "GATLING_VERSION", "${gatlingVersion}"
+    workingDir "${rootDir}"
+    commandLine './run_gatling_report_only.sh'
+}
+
+task gatlingCleanup(type: Test){
+    useJUnitPlatform{
+        includeTags "gatlingCleanup"
+    }
+    failFast = true
+    testLogging {
+        showStandardStreams = true
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "\nTest result: ${result.resultType}"
+            println "Test summary: ${result.testCount} tests, " +
+                    "${result.successfulTestCount} succeeded, " +
+                    "${result.failedTestCount} failed, " +
+                    "${result.skippedTestCount} skipped"
+        }
+    }
+}
+
+test {
+    useJUnitPlatform{
+        excludeTags "galingCleanup"
+    }
+}
+
+task deleteGatlingArtifact(type: Delete){
+    delete "gatling-${gatlingVersion}.zip" // 'uglyFolder', 'uglyFile'
+    followSymlinks = true
+}
+
+clean.doFirst {
+    delete "${rootDir}/src/gatling/resources/gatling.log"
+    delete "${rootDir}/results"
+    delete "${rootDir}/gatling-${gatlingVersion}"
+    delete "${rootDir}/gatling-${gatlingVersion}.zip"
+    delete "${rootDir}/hars"
+}
+
+task gatlingRunner(type: JavaExec, dependsOn: classes) {
+    main = 'absoft.com.beats.GatlingRunner'
+    classpath sourceSets.gatling.runtimeClasspath
+    classpath configurations.runtime
+    jvmArgs = ['-server', '-Xms7g', '-Xmx9g', '-XX:-UseGCOverheadLimit']
 }
 
 wrapper {
