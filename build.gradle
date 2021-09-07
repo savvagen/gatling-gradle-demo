@@ -182,7 +182,7 @@ clean.doFirst {
 }
 
 task gatlingRunner(type: JavaExec, dependsOn: classes) {
-    main = 'absoft.com.beats.GatlingRunner'
+    main = 'org.example.GatlingRunner'
     classpath sourceSets.gatling.runtimeClasspath
     classpath configurations.runtime
     jvmArgs = ['-server', '-Xms7g', '-Xmx9g', '-XX:-UseGCOverheadLimit']
