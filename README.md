@@ -19,7 +19,7 @@ Server will be available on: http://localhost:3001/
 
 2. Run specific simulations:
 ``` 
-./gradlew clean gatlingRun-org.example.simulations.LoadTestSimulation
+./gradlew clean gatlingRun-org.example.simulations.FirstSimulation
 ```
 More info in [Gatling Gradle plugin]("https://github.com/lkishalmi/gradle-gatling-plugin#default-tasks")
 
