@@ -38,7 +38,7 @@ sourceSets {
 
 dependencies {
     compile "org.scala-lang:scala-library:$scalaVersion"
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.2'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.2'
     implementation(
             "io.gatling:gatling-core:${gatlingVersion}",
             "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}",
@@ -60,7 +60,7 @@ dependencies {
     )
     gatlingImplementation 'org.apache.commons:commons-lang3:3.12.0'
     gatling 'com.github.javafaker:javafaker:1.0.2'
-    gatlingCompile(
+    gatlingImplementation(
             'com.google.code.gson:gson:2.8.8',
             'com.fasterxml.jackson.core:jackson-databind:2.12.5',
             'ch.qos.logback:logback-classic:1.2.5',
@@ -70,7 +70,7 @@ dependencies {
     )
     // Gatling AMQP Plugin for RabbitMQ Testing
     // + Gatling extension: https://github.com/TinkoffCreditSystems/gatling-picatinny
-    gatlingCompile group: 'ru.tinkoff', name: 'gatling-amqp-plugin_2.13', version: '0.5.1'
+    gatlingImplementation group: 'ru.tinkoff', name: 'gatling-amqp-plugin_2.13', version: '0.5.1'
 }
 
 
